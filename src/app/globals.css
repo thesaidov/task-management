@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+input {
+  color: #364153;
+}
+textarea {
+  color: #364153;
+}
+option{
+  color: #364153;
+}
+select{
+  color: #364153;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

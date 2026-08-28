@@ -27,6 +27,7 @@ export default function RegisterPage() {
     }
 
     try {
+      console.log("Registering user with:", { name, email, password });
       const response = await fetch("/api/register", {
         method: "POST",
         headers: {
@@ -43,8 +44,8 @@ export default function RegisterPage() {
         return;
       }
 
-      // Redirect to login page after successful registration
-      router.push("/login?registered=true");
+      // Redirect to verification page after registration
+      router.push(`/register/verify?email=${encodeURIComponent(email)}`);
     } catch (err) {
       setError("Something went wrong");
       setLoading(false);

@@ -11,6 +11,7 @@ import {
   TaskPriority,
   ProjectMember,
 } from "@/types";
+import { auth } from "@/auth";
 
 export default function ProjectDetailPage({
   params,
@@ -81,7 +82,7 @@ export default function ProjectDetailPage({
     if (!confirm("Are you sure you want to delete this task?")) return;
 
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
+      const response = await fetch(`/api/my-tasks/${taskId}`, {
         method: "DELETE",
       });
 
@@ -442,6 +443,8 @@ function TaskModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const { data: session } = useSession();
+
   // Build assignable users - include owner + members
   const assignableUsers = [
     { id: projectOwnerId, name: `${projectOwnerName} (Owner)`, email: "" },
@@ -473,6 +476,7 @@ function TaskModal({
           dueDate: dueDate || null,
           projectId,
           assignedToId: assignedToId || null,
+          creatorId: session?.user?.id || null,
         }),
       });
 

@@ -4,7 +4,16 @@ import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 
+const authSecret =
+  process.env.AUTH_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
+  process.env.JWT_SECRET ||
+  (process.env.NODE_ENV === "development"
+    ? "task-management-local-development-secret"
+    : undefined)
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: authSecret,
   providers: [
     Credentials({
       credentials: {

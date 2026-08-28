@@ -5,14 +5,16 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
+  emailVerified Boolean @default(false)
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -20,11 +22,26 @@ model User {
   // Relations
   ownedProjects  Project[]       @relation("ProjectOwner")
   memberProjects ProjectMember[]
-  assignedTasks  Task[]
+  assignedTasks Task[] @relation("TaskAssignee")
+  verifications  Verification[]
+  createdTasks Task[] @relation("TaskCreator")
 
   // Friends
   sentRequests     Friendship[] @relation("FriendshipSender")
   receivedRequests Friendship[] @relation("FriendshipReceiver")
+}
+
+model Verification {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([code])
 }
 
 model Project {
@@ -87,9 +104,13 @@ model Task {
   // Relations
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
+
+  creatorId String
+  creator   User   @relation("TaskCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+
   assignedToId String?
-  assignedTo   User?   @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  assignedTo   User?   @relation("TaskAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  
 
   @@index([projectId])
   @@index([assignedToId])

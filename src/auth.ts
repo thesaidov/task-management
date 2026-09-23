@@ -14,6 +14,9 @@ const authSecret =
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: authSecret,
+  trustHost:
+    process.env.AUTH_TRUST_HOST === "true" ||
+    process.env.NODE_ENV === "development",
   providers: [
     Credentials({
       credentials: {
